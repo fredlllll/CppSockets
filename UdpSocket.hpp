@@ -20,8 +20,20 @@ class UdpSocket : public Socket {
         void setupTimeout(uint32_t msec)
         {
             if (msec > 0) {
-                Socket::setUdpTimeout(msec);
+                setUdpTimeout(msec);
             }
+        }
+
+        void setUdpTimeout(uint32_t msec)
+        {
+#ifdef _WIN32
+            setsockopt(_sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&msec, sizeof(msec));
+#else
+            struct timeval timeout;
+            timeout.tv_sec = msec / 1000;
+            timeout.tv_usec = (msec * 1000) % 1000000;
+            setsockopt(_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+#endif
         }
 
     public:
