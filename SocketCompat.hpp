@@ -12,6 +12,7 @@
 #ifdef _WIN32
 #pragma comment(lib,"ws2_32.lib")
 #define WIN32_LEAN_AND_MEAN
+typedef SOCKET socket_t;
 #undef TEXT
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -19,7 +20,7 @@
 // Linux
 #else
 #define sprintf_s sprintf
-typedef int SOCKET;
+typedef int socket_t;
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -35,7 +36,7 @@ class Socket {
 
     protected:
 
-        SOCKET _sock;
+        socket_t _sock;
 
         char _message[200];
 
