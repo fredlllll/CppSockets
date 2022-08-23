@@ -120,7 +120,7 @@ class Socket {
 
     public:
 
-        void closeConnection(void)
+        void close(void)
         {
 #ifdef _WIN32
             closesocket(_sock);
