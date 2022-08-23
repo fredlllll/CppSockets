@@ -34,12 +34,8 @@ static const int SOCKET_ERROR   = -1;
 #include <stdint.h>
 
 class Socket {
-
     protected:
-
         socket_t _sock;
-
-        char _message[200];
 
         bool initWinsock(void)
         {
@@ -47,7 +43,12 @@ class Socket {
             WSADATA wsaData;
             int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
             if (iResult != 0) {
-                sprintf_s(_message, "WSAStartup() failed with error: %d\n", iResult);
+                LPSTR errorMessagePtr = NULL;
+                FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, iResult, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (LPTSTR)&errorMessagePtr, 0, NULL);
+                if (errorMessagePtr) {
+                    // TODO:do something with the message in errorMessage
+                    LocalFree(errorMessagePtr);
+                }
                 return false;
             }
 #endif
@@ -94,10 +95,5 @@ class Socket {
 #else
             close(_sock);
 #endif
-        }
-
-        char * getMessage(void)
-        {
-            return _message;
         }
 };
