@@ -10,70 +10,66 @@
 
 #include "SocketCompat.hpp"
 
-class TcpSocket : public Socket {
+namespace CppSockets {
+	class TcpSocket : public Socket {
+	private:
+		//prevent socket copying and assignment
+		TcpSocket(const TcpSocket& other) = delete;
+		TcpSocket& operator=(const TcpSocket&) = delete;
+	public:
 
-    protected:
+		TcpSocket(socket_t sock) :
+			Socket(sock) {}
 
-        char _host[200];
-        char _port[10];
+		TcpSocket(const char* host, const unsigned short port) :
+			Socket()
+		{
+			//convert port to string cause getaddrinfo wants a string
+			char _port[6];
+			sprintf(_port, "%d", port);
 
-        SOCKET _conn;
+			// Set up client address info
+			struct addrinfo hints = { 0 };
+			hints.ai_family = AF_INET;
+			hints.ai_socktype = SOCK_STREAM;
 
-        struct addrinfo * _addressInfo;
+			// Resolve the server address and port, returning on failure
+			addrinfo* _addressInfo = NULL;
+			int result = getaddrinfo(host, _port, &hints, &_addressInfo);
+			if (result != 0) {
+#ifdef _WIN32
+				handleWinapiError(result);
+#else
+				CPPSOCKETS_DEBUG_PRINT_ERROR("getaddrinfo() failed with error: %d", result);
+#endif
+				return;
+			}
 
-        bool _connected;
+			// Create a SOCKET for connecting to server, returning on failure
+			_sock = socket(_addressInfo->ai_family, _addressInfo->ai_socktype, _addressInfo->ai_protocol);
+			if (_sock == INVALID_SOCKET) {
+				CPPSOCKETS_DEBUG_PRINT_ERROR("socket() failed");
+				freeaddrinfo(_addressInfo);
+				return;
+			}
 
-        TcpSocket(const char * host, const short port)
-        {
-            sprintf_s(_host, "%s", host);
-            sprintf_s(_port, "%d", port);
+			result = connect(_sock, _addressInfo->ai_addr, (int)_addressInfo->ai_addrlen);
+			if (result == SOCKET_ERROR) {
+				close();	
+			}
+			freeaddrinfo(_addressInfo);
+		}
 
-            // No connection yet
-            _sock = INVALID_SOCKET;
-            _connected = false;
-            *_message = 0;
-
-            // Initialize Winsock, returning on failure
-            if (!initWinsock()) return;
-
-            // Set up client address info
-            struct addrinfo hints = {0};
-            hints.ai_family = AF_INET;
-            hints.ai_socktype = SOCK_STREAM;
-
-            // Resolve the server address and port, returning on failure
-            _addressInfo = NULL;
-            int iResult = getaddrinfo(_host, _port, &hints, &_addressInfo);
-            if ( iResult != 0 ) {
-                sprintf_s(_message, "getaddrinfo() failed with error: %d", iResult);
-                cleanup();
-                return;
-            }
-
-            // Create a SOCKET for connecting to server, returning on failure
-            _sock = socket(_addressInfo->ai_family, _addressInfo->ai_socktype, _addressInfo->ai_protocol);
-            if (_sock == INVALID_SOCKET) {
-                sprintf_s(_message, "socket() failed");
-                cleanup();
-                return;
-            }
-        }
-
-    public:
-
-        bool sendData(void *buf, size_t len)
-        {
-            return (size_t)send(_conn, (const char *)buf, len, 0) == len;
-        }
+		bool sendData(void* buf, size_t len)
+		{
+			return (size_t)send(_sock, (const char*)buf, len, 0) == len;
+		}
 
 
-        bool receiveData(void *buf, size_t len)
-        {
-            return (size_t)recv(_conn, (char *)buf, len, 0) == len;
-        }
-        bool isConnected()
-        {
-            return _connected;
-        }
+		bool receiveData(void* buf, size_t len)
+		{
+			return (size_t)recv(_sock, (char*)buf, len, 0) == len;
+		}
+	};
+}
 
-};

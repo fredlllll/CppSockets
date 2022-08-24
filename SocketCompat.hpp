@@ -10,12 +10,14 @@
 
 namespace CppSockets {
 
+#define CPPSOCKETS_DEBUG
+
 #ifdef CPPSOCKETS_DEBUG
-#define CPPSOCKETS_DEBUG_PRINT(X) fprintf(stdout, X)
-#define CPPSOCKETS_DEBUG_PRINT_ERROR(X) fprintf(stderr, X)
+#define CPPSOCKETS_DEBUG_PRINT(...) fprintf(stdout, __VA_ARGS__)
+#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) fprintf(stderr, __VA_ARGS__)
 #else
-#define CPPSOCKETS_DEBUG_PRINT(X)
-#define CPPSOCKETS_DEBUG_PRINT_ERROR(X)
+#define CPPSOCKETS_DEBUG_PRINT(...)
+#define CPPSOCKETS_DEBUG_PRINT_ERROR(...)
 #endif
 
 	// Windows
@@ -36,7 +38,7 @@ namespace CppSockets {
 #include <netdb.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-	static const int INVALID_SOCKET = -1;
+	static const socket_t INVALID_SOCKET = ~0;
 	static const int SOCKET_ERROR = -1;
 #endif
 
@@ -102,8 +104,18 @@ namespace CppSockets {
 
 
 	class Socket {
+	private:
+		//prevent socket copying
+		Socket(const Socket& other) = delete;
+		Socket& operator=(const Socket&) = delete;
 	protected:
 		socket_t _sock;
+
+		Socket() :_sock(INVALID_SOCKET) {}
+		Socket(socket_t sock) :_sock(sock) {}
+		virtual ~Socket() {
+			close();
+		}
 
 		static void inetPton(const char* host, struct sockaddr_in& saddr_in)
 		{
@@ -124,11 +136,14 @@ namespace CppSockets {
 
 		void close(void)
 		{
+			if (_sock != INVALID_SOCKET) {
 #ifdef _WIN32
-			closesocket(_sock);
+				closesocket(_sock);
 #else
-			close(_sock);
+				close(_sock);
 #endif
+				_sock = INVALID_SOCKET;
+			}
 		}
 	};
 
