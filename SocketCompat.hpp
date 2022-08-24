@@ -8,6 +8,8 @@
 
 #pragma once
 
+namespace CppSockets {
+
 #ifdef CPPSOCKETS_DEBUG
 #define CPPSOCKETS_DEBUG_PRINT(X) fprintf(stdout, X)
 #define CPPSOCKETS_DEBUG_PRINT_ERROR(X) fprintf(stderr, X)
@@ -16,26 +18,26 @@
 #define CPPSOCKETS_DEBUG_PRINT_ERROR(X)
 #endif
 
-// Windows
+	// Windows
 #ifdef _WIN32
 #pragma comment(lib,"ws2_32.lib")
 #define WIN32_LEAN_AND_MEAN
-typedef SOCKET socket_t;
+	typedef SOCKET socket_t;
 #undef TEXT
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-// Linux
+	// Linux
 #else
 #define sprintf_s sprintf
-typedef int socket_t;
+	typedef int socket_t;
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-static const int INVALID_SOCKET = -1;
-static const int SOCKET_ERROR   = -1;
+	static const int INVALID_SOCKET = -1;
+	static const int SOCKET_ERROR = -1;
 #endif
 
 #include <stdio.h>
@@ -43,89 +45,91 @@ static const int SOCKET_ERROR   = -1;
 
 #ifdef _WIN32
 
-void handleWinapiError(int error) {
+	void handleWinapiError(int error) {
 #ifdef CPPSOCKETS_DEBUG
-    LPSTR errorMessagePtr = NULL;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, error, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (LPTSTR)&errorMessagePtr, 0, NULL);
-    if (errorMessagePtr) {
-        CPPSOCKETS_DEBUG_PRINT_ERROR(errorMessagePtr);
-        LocalFree(errorMessagePtr);
-    }
+		LPSTR errorMessagePtr = NULL;
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, error, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (LPTSTR)&errorMessagePtr, 0, NULL);
+		if (errorMessagePtr) {
+			CPPSOCKETS_DEBUG_PRINT_ERROR(errorMessagePtr);
+			LocalFree(errorMessagePtr);
+		}
 #endif
-}
+	}
 
-bool _cppsockets_initWinsockSuccess = false;
-bool initWinsock() {
-    if (_cppsockets_initWinsockSuccess) {
-        return true;
-    }
-    WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0) {
-        handleWinapiError(result);
-        return false;
-    }
-    _cppsockets_initWinsockSuccess = true;
-    return true;
-}
+	bool _cppsockets_initWinsockSuccess = false;
+	bool initWinsock() {
+		if (_cppsockets_initWinsockSuccess) {
+			return true;
+		}
+		WSADATA wsaData;
+		int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		if (result != 0) {
+			handleWinapiError(result);
+			return false;
+		}
+		_cppsockets_initWinsockSuccess = true;
+		return true;
+	}
 
-bool cleanupWinsock() {
-    if (_cppsockets_initWinsockSuccess) {
-        _cppsockets_initWinsockSuccess = false;
-        int result = WSACleanup();
-        if (result != 0) {
-            handleWinapiError(result);
-            return false;
-        }
-    }
-    return true;
-}
+	bool cleanupWinsock() {
+		if (_cppsockets_initWinsockSuccess) {
+			_cppsockets_initWinsockSuccess = false;
+			int result = WSACleanup();
+			if (result != 0) {
+				handleWinapiError(result);
+				return false;
+			}
+		}
+		return true;
+	}
 #endif
 
-void cppSocketsInit() {
+	void cppSocketsInit() {
 #ifdef _WIN32
-    if (!initWinsock()) {
-        //honestly no idea
-    }
+		if (!initWinsock()) {
+			//honestly no idea
+		}
 #endif
-}
+	}
 
-void cppSocketsDeinit() {
+	void cppSocketsDeinit() {
 #ifdef _WIN32
-    if (!cleanupWinsock()) {
-        //honestly no idea
-    }
+		if (!cleanupWinsock()) {
+			//honestly no idea
+		}
 #endif
-}
+	}
 
 
-class Socket {
-    protected:
-        socket_t _sock;
+	class Socket {
+	protected:
+		socket_t _sock;
 
-        static void inetPton(const char * host, struct sockaddr_in & saddr_in)
-        {
+		static void inetPton(const char* host, struct sockaddr_in& saddr_in)
+		{
 #ifdef _WIN32
 #ifdef UNICODE
-            WCHAR host_[64];
-            swprintf_s(host_, L"%S", host);
+			WCHAR host_[64];
+			swprintf_s(host_, L"%S", host);
 #else
-            const char* host_ = host;
+			const char* host_ = host;
 #endif
-            InetPton(AF_INET, host_, &(saddr_in.sin_addr.s_addr));
+			InetPton(AF_INET, host_, &(saddr_in.sin_addr.s_addr));
 #else
-            inet_pton(AF_INET, host, &(saddr_in.sin_addr));
+			inet_pton(AF_INET, host, &(saddr_in.sin_addr));
 #endif
-        }
+		}
 
-    public:
+	public:
 
-        void close(void)
-        {
+		void close(void)
+		{
 #ifdef _WIN32
-            closesocket(_sock);
+			closesocket(_sock);
 #else
-            close(_sock);
+			close(_sock);
 #endif
-        }
-};
+		}
+	};
+
+}
