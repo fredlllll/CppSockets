@@ -1,11 +1,3 @@
-/*
- * Cross-platform compatibility superclass for sockets
- *
- * Copyright (C) 2019 Simon D. Levy
- *
- * MIT License
- */
-
 #pragma once
 
 namespace CppSockets {
@@ -102,49 +94,18 @@ namespace CppSockets {
 #endif
 	}
 
-
-	class Socket {
-	private:
-		//prevent socket copying
-		Socket(const Socket& other) = delete;
-		Socket& operator=(const Socket&) = delete;
-	protected:
-		socket_t _sock;
-
-		Socket() :_sock(INVALID_SOCKET) {}
-		Socket(socket_t sock) :_sock(sock) {}
-		virtual ~Socket() {
-			close();
-		}
-
-		static void inetPton(const char* host, struct sockaddr_in& saddr_in)
-		{
+	void inetPton(const char* host, struct sockaddr_in& saddr_in)
+	{
 #ifdef _WIN32
 #ifdef UNICODE
-			WCHAR host_[64];
-			swprintf_s(host_, L"%S", host);
+		WCHAR host_[64];
+		swprintf_s(host_, L"%S", host);
 #else
-			const char* host_ = host;
+		const char* host_ = host;
 #endif
-			InetPton(AF_INET, host_, &(saddr_in.sin_addr.s_addr));
+		InetPton(AF_INET, host_, &(saddr_in.sin_addr.s_addr));
 #else
-			inet_pton(AF_INET, host, &(saddr_in.sin_addr));
+		inet_pton(AF_INET, host, &(saddr_in.sin_addr));
 #endif
-		}
-
-	public:
-
-		void close(void)
-		{
-			if (_sock != INVALID_SOCKET) {
-#ifdef _WIN32
-				closesocket(_sock);
-#else
-				close(_sock);
-#endif
-				_sock = INVALID_SOCKET;
-			}
-		}
-	};
-
+	}
 }
