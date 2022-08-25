@@ -8,9 +8,11 @@
 
 #pragma once
 
-#include "SocketCompat.hpp"
+#include "Socket.hpp"
 
-class UdpSocket : public Socket {
+namespace CppSockets {
+
+    class UdpClient : public Socket {
 
     protected:
 
@@ -38,14 +40,15 @@ class UdpSocket : public Socket {
 
     public:
 
-        void sendData(void * buf, size_t len)
+        void sendData(void* buf, size_t len)
         {
-            sendto(_sock, (const char *)buf, (int)len, 0, (struct sockaddr *) &_si_other, (int)_slen);
+            sendto(_sock, (const char*)buf, (int)len, 0, (struct sockaddr*)&_si_other, (int)_slen);
 
         }
 
-        bool receiveData(void * buf, size_t len)
+        bool receiveData(void* buf, size_t len)
         {
-            return recvfrom(_sock, (char *)buf, (int)len, 0, (struct sockaddr *) &_si_other, &_slen) == _slen;
+            return recvfrom(_sock, (char*)buf, (int)len, 0, (struct sockaddr*)&_si_other, &_slen) == _slen;
         }
-};
+    };
+}

@@ -7,7 +7,7 @@
  */
 
 #pragma once
-
+/*
 #include "UdpSocket.hpp"
 
 #include <string.h>
@@ -39,3 +39,4 @@ class UdpClientSocket : public UdpSocket {
             UdpSocket::setUdpTimeout(timeoutMsec);
         }
 };
+*/

@@ -69,7 +69,7 @@ namespace CppSockets {
 
 			freeaddrinfo(_addressInfo);
 
-			int result = listen(_sock, backlog);
+			result = listen(_sock, backlog);
 			if (result == SOCKET_ERROR) {
 				CPPSOCKETS_DEBUG_PRINT_ERROR("listen() failed");
 				close();
