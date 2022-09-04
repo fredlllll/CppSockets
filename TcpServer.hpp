@@ -137,7 +137,11 @@ namespace CppSockets {
 				int select_status = select(NULL, &read_fds, NULL, NULL, &timeout); //0 if timeout
 				if (select_status == -1) {
 					// ERROR: do something
-					CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
+					#ifdef _WIN32
+						CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
+					#else
+						CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed");
+					#endif
 					break;
 				}
 				else if (select_status > 0) {
