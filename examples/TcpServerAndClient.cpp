@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 	printf("creating client\n");
 	CppSockets::TcpClient client("localhost", 8989);
 	printf("sending data\n");
-	client.sendData("12345", 5);
+	client.sendData((void *)"12345", 5);
 	char buffer[10];
 	printf("receiving data\n");
 	auto cnt = client.receiveData(buffer, 10);
