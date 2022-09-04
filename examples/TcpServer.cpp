@@ -24,7 +24,7 @@ void testAccept(std::shared_ptr<CppSockets::TcpClient> client) {
 int main(int argc, char** argv) {
 	printf("starting\n");
 	CppSockets::cppSocketsInit();
-	printf("creating server");
+	printf("creating server\n");
 	CppSockets::TcpServer server(80);
 	printf("setting callback\n");
 	server.acceptCallback = &testAccept;
