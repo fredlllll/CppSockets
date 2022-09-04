@@ -14,6 +14,7 @@ linux/*client
 Debug/
 windows/*/*/x64/
 windows/*/x64/
+build
 
 out/
 .vs/
