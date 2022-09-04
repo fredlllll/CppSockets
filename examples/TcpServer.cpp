@@ -1,4 +1,6 @@
 #include "../TcpServer.hpp"
+#include <stdio.h>
+#include <iostream>
 
 void testAccept(std::shared_ptr<CppSockets::TcpClient> client) {
 	char data[] = "HTTP/1.1 200 OK\n\nHello World";
@@ -18,8 +20,6 @@ void testAccept(std::shared_ptr<CppSockets::TcpClient> client) {
 	printf("sent stuff\n");
 	client->close();
 }
-#include <stdio.h>
-#include <iostream>
 
 int main(int argc, char** argv) {
 	printf("starting\n");
