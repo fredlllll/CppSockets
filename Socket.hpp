@@ -31,7 +31,7 @@ namespace CppSockets {
 #ifdef _WIN32
 				closesocket(_sock);
 #else
-				close(_sock);
+				::close(_sock);
 #endif
 				_sock = INVALID_SOCKET;
 			}
