@@ -26,6 +26,11 @@ ${LIBRARY_SOURCES}
 "examples/TcpServerAndClient.cpp"
 )
 
+set( CHAT_SERVER_SOURCES
+${LIBRARY_SOURCES}
+"examples/ChatServer.cpp"
+)
+
 #add_library(CppSockets SHARED ${LIBRARY_SOURCES})
 #set_target_properties(CppSockets PROPERTIES LINKER_LANGUAGE CXX)
 #target_link_libraries(CppSockets Threads::Threads)
@@ -37,3 +42,7 @@ target_link_libraries(TcpServerExample Threads::Threads)
 add_executable(TcpServerAndClientExample ${TCP_SERVER_AND_CLIENT_SOURCES})
 set_target_properties(TcpServerAndClientExample PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(TcpServerAndClientExample Threads::Threads)
+
+add_executable(ChatServerExample ${CHAT_SERVER_SOURCES})
+set_target_properties(ChatServerExample PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(ChatServerExample Threads::Threads)
