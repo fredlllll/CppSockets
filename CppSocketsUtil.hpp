@@ -35,16 +35,25 @@ static const int SOCKET_ERROR = -1;
 
 #include <stdio.h>
 #include <stdint.h>
+#include <mutex>
+#include <iostream>
+#include <iomanip>
+
+#define LOCK_GUARD(X) std::lock_guard<std::mutex> __lock_guard__(X)
+
 namespace CppSockets {
 
 #ifdef _WIN32
 	void handleWinapiError(int error) {
 #ifdef CPPSOCKETS_DEBUG
 		LPSTR errorMessagePtr = NULL;
-		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, error, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (LPTSTR)&errorMessagePtr, 0, NULL);
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (LPTSTR)&errorMessagePtr, 0, NULL);
 		if (errorMessagePtr) {
 			CPPSOCKETS_DEBUG_PRINT_ERROR(errorMessagePtr);
 			LocalFree(errorMessagePtr);
+		}
+		else {
+			CPPSOCKETS_DEBUG_PRINT_ERROR("didnt managed to format winapi error %d\n", error);
 		}
 #endif
 	}
@@ -106,5 +115,14 @@ namespace CppSockets {
 #else
 		inet_pton(AF_INET, host, &(saddr_in.sin_addr));
 #endif
+	}
+
+	void printHex(const char* bytes, size_t len) {
+		std::cout << std::hex;
+		for (int i = 0; i < len; ++i) {
+			std::cout << std::setfill('0') << std::setw(2) << (unsigned int)(unsigned char)bytes[i] << " ";
+		}
+		std::cout << std::endl;
+		std::cout << std::dec;
 	}
 }

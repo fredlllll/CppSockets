@@ -61,15 +61,15 @@ namespace CppSockets {
 			freeaddrinfo(_addressInfo);
 		}
 
-		int sendData(void* buf, size_t len)
+		int sendData(void* buf, int len)
 		{
-			return send(_sock, (const char*)buf, len, 0) == len;
+			return send(_sock, (const char*)buf, len, 0);
 		}
 
 
-		int receiveData(void* buf, size_t len)
+		int receiveData(void* buf, int len)
 		{
-			return recv(_sock, (char*)buf, len, 0) == len;
+			return recv(_sock, (char*)buf, len, 0);
 		}
 	};
 }

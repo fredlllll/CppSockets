@@ -17,6 +17,8 @@ ${LIBRARY_SOURCES}
 "examples/TcpServer.cpp"
 )
 
-add_library(CppSockets SHARED ${LIBRARY_SOURCES})
+#add_library(CppSockets SHARED ${LIBRARY_SOURCES})
+#set_target_properties(CppSockets PROPERTIES LINKER_LANGUAGE CXX)
+
 add_executable(CppSocketsTest ${TEST_SOURCES})
-set_target_properties(CppSockets PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(CppSocketsTest PROPERTIES LINKER_LANGUAGE CXX)
