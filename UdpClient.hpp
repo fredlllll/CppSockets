@@ -10,8 +10,6 @@
 
 #include "Socket.hpp"
 
-// TODO: delete this comment
-
 namespace CppSockets {
 
     class UdpClient : public Socket {
