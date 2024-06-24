@@ -21,10 +21,9 @@ std::vector<chatClient> clients;
 
 void broadcastMessage(char* message, unsigned int len) {
 	LOCK_GUARD(serverMutex);
-	for each (auto cc in clients)
-	{
+	std::for_each(clients.begin(), clients.end(), [](auto cc) {
 		cc.client->sendData((void*)&opMessage, sizeof(int));
-	}
+	});
 }
 
 void clientLoop(std::shared_ptr<CppSockets::TcpClient> client) {
@@ -84,9 +83,8 @@ int main(int argc, char** argv) {
 	server->stopListening();
 	printf("stopped listening\n");
 
-	for each (auto cc in clients)
-	{
+	std::for_each(clients.begin(), clients.end(), [](auto cc) {
 		cc.client->close();
 		cc.receiveThread->join();
-	}
+	});
 }
